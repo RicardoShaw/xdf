@@ -1,0 +1,231 @@
+<?xml version="1.0" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xsi:schemaLocation="http://www.springframework.org/schema/jdbc 
+	http://www.springframework.org/schema/jdbc/spring-jdbc-4.1.xsd
+	http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx.xsd
+	http://www.springframework.org/schema/aop 
+	http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+
+
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+	destroy-method="close">
+		<property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+		<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/xdf1"></property>
+		<property name="user" value="root"></property>
+		<property name="password" value="1024"></property>
+		<property name="maxPoolSize" value="40"></property>
+		<property name="minPoolSize" value="1"></property>
+		<property name="initialPoolSize" value="1"></property>
+		<property name="maxIdleTime" value="20"></property>
+	</bean>
+	
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.cache.use_second_level_cache">true</prop>
+				<prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
+			</props>
+		</property>
+		<property name="mappingResources">
+			<list>
+					<value>com/ricardo/hibernatexml/Menu.hbm.xml</value>
+					<value>com/ricardo/hibernatexml/Score.hbm.xml</value>
+					<value>com/ricardo/hibernatexml/Cchapter.hbm.xml</value>
+					<value>com/ricardo/hibernatexml/Student.hbm.xml</value>
+					<value>com/ricardo/hibernatexml/Slinkc.hbm.xml</value>
+					<value>com/ricardo/hibernatexml/Cl.hbm.xml</value>
+					<value>com/ricardo/hibernatexml/Colinkch.hbm.xml</value>
+					<value>com/ricardo/hibernatexml/Teacher.hbm.xml</value>
+					<value>com/ricardo/hibernatexml/Course.hbm.xml</value>
+					<value>com/ricardo/hibernatexml/Clinkc.hbm.xml</value>
+					<value>com/ricardo/hibernatexml/Admin.hbm.xml</value>
+					<value>com/ricardo/hibernatexml/Tlinkc.hbm.xml</value></list>
+		</property>
+		
+		</bean>
+		
+		<bean id="transactionManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+	<tx:annotation-driven transaction-manager="transactionManager" />
+		<!-- 配置事务增强处理Bean,指定事务管理器 -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<!-- 用于配置详细的事务语义 -->
+		<tx:attributes>
+			<!-- 所有以'get'开头的方法是read-only的 -->
+			<tx:method name="get*" read-only="true"/>
+			<!-- 其他方法使用默认的事务设置 -->
+			<tx:method name="*"/>
+		</tx:attributes>
+	</tx:advice>
+	<aop:config>
+		<!-- 配置一个切入点，匹配empManager和mgrManager
+			两个Bean的所有方法的执行 -->
+		<aop:pointcut id="ricardoPointcut"
+			expression="bean(*Service)||bean(*Action)"/>
+		<!-- 指定在leePointcut切入点应用txAdvice事务增强处理 -->
+		<aop:advisor advice-ref="txAdvice" 
+			pointcut-ref="ricardoPointcut"/>
+	</aop:config>
+	
+	<!-- ↓特别重要，没有的话就代理出错 -->
+	<aop:aspectj-autoproxy proxy-target-class="true"
+		expose-proxy="true" />
+	<!-- ↑特别重要，不要删除了 -->
+	
+	 
+	 
+	 <bean id="daoTemplate" abstract="true" lazy-init="true"   p:sessionFactory-ref="sessionFactory"/>
+	<bean id="imenuDao" class="com.ricardo.dao.impl.MenuDAO"  lazy-init="false"  parent="daoTemplate"/>
+	<bean id="iscoreDao" class="com.ricardo.dao.impl.ScoreDAO"  lazy-init="false"  parent="daoTemplate"/>
+	<bean id="icchapterDao" class="com.ricardo.dao.impl.CchapterDAO"  lazy-init="false"  parent="daoTemplate"/>
+	<bean id="istudentDao" class="com.ricardo.dao.impl.StudentDAO"  lazy-init="false"  parent="daoTemplate"/>
+	<bean id="islinkcDao" class="com.ricardo.dao.impl.SlinkcDAO"  lazy-init="false"  parent="daoTemplate"/>
+	<bean id="icolinkchDao" class="com.ricardo.dao.impl.ColinkchDAO"  lazy-init="false"  parent="daoTemplate"/>
+	<bean id="iteacherDao" class="com.ricardo.dao.impl.TeacherDAO" lazy-init="false"   parent="daoTemplate"/>
+	<bean id="icourseDao" class="com.ricardo.dao.impl.CourseDAO"  lazy-init="false"  parent="daoTemplate"/>
+	<bean id="iclinkcDao" class="com.ricardo.dao.impl.ClinkcDAO"  lazy-init="false"  parent="daoTemplate"/>
+	<bean id="iadminDao" class="com.ricardo.dao.impl.AdminDAO"  lazy-init="false"  parent="daoTemplate"/>
+	<bean id="itlinkcDao" class="com.ricardo.dao.impl.TlinkcDAO"  lazy-init="false"  parent="daoTemplate"/>
+	<bean id="iclDao" class="com.ricardo.dao.impl.ClDAO"  lazy-init="false"  parent="daoTemplate"/>
+	
+	
+	
+
+	
+	<bean id="visitorService" class="com.ricardo.service.impl.VisitorServiceImpl" lazy-init="false"
+	p:iteacherDao-ref="iteacherDao"
+	p:istudentDao-ref="istudentDao"
+	p:iclDao-ref="iclDao"
+	p:itlinkcDao-ref="itlinkcDao"
+	p:iscoreDao-ref="iscoreDao"
+	/>
+	
+	<bean id="loginService" class="com.ricardo.service.impl.LoginServiceImpl" lazy-init="false"
+	p:iteacherDao-ref="iteacherDao"
+	/>
+	
+	<bean id="classService" class="com.ricardo.service.impl.ClassServiceImpl" lazy-init="false"
+	p:iclDao-ref="iclDao"
+	/>
+	
+	<bean id="courseService" class="com.ricardo.service.impl.CourseServiceImpl" lazy-init="false"
+	p:icourseDao-ref="icourseDao"
+	/>
+	
+	<bean id="chapterService" class="com.ricardo.service.impl.ChapterServiceImpl" lazy-init="false"
+	p:icchapterDao-ref="icchapterDao"
+	/>
+	
+	<bean id="scoreService" class="com.ricardo.service.impl.ScoreServiceImpl" lazy-init="false"
+	p:iscoreDao-ref="iscoreDao"
+	/>
+	
+	<bean id="studentService" class="com.ricardo.service.impl.StudentServiceImpl" lazy-init="false"
+	p:istudentDao-ref="istudentDao"
+	/>
+	
+	<bean id="teacherService" class="com.ricardo.service.impl.TeacherServiceImpl" lazy-init="false"
+	p:iteacherDao-ref="iteacherDao"
+	/>
+	
+	<bean id="tlinkcService" class="com.ricardo.service.impl.TlinkcServiceImpl" lazy-init="false"
+	p:itlinkcDao-ref="itlinkcDao"
+	/>
+	
+
+	
+	<bean id="slinkcService" class="com.ricardo.service.impl.SlinkcServiceImpl" lazy-init="false"
+	p:islinkcDao-ref="islinkcDao"
+	/>
+	
+	<bean id="clinkcService" class="com.ricardo.service.impl.ClinkcServiceImpl" lazy-init="false"
+	p:iclinkcDao-ref="iclinkcDao"
+	/>
+	
+	<bean id="colinkchService" class="com.ricardo.service.impl.ColinkchServiceImpl" lazy-init="false"
+	p:icolinkchDao-ref="icolinkchDao"
+	/>
+	 
+	
+	<!-- Action类 -->
+
+
+	
+	<bean id="visitorAction" class="com.ricardo.action.VisitorAction" lazy-init="false"
+	p:visitorService-ref="visitorService"
+	/>
+	
+	<bean id="scoreAction" class="com.ricardo.action.ScoreAction" lazy-init="false"
+	p:scoreService-ref="scoreService"
+	p:classService-ref="classService"
+	/>
+	
+	<bean id="studentAction" class="com.ricardo.action.StudentAction" lazy-init="false"
+	p:studentService-ref="studentService"
+	/>
+	
+	<bean id="classAction" class="com.ricardo.action.ClassAction" lazy-init="false"
+	p:classService-ref="classService"
+	/>
+	
+	<bean id="teacherAction" class="com.ricardo.action.TeacherAction" lazy-init="false"
+	p:teacherService-ref="teacherService"
+	/>
+	<bean id="chapterAction" class="com.ricardo.action.ChapterAction" lazy-init="false"
+	p:chapterService-ref="chapterService"
+	/>
+	
+	<bean id="clinkcAction" class="com.ricardo.action.ClinkcAction" lazy-init="false"
+	p:courseService-ref="courseService"
+	p:classService-ref="classService"
+	p:teacherService-ref="teacherService"
+	p:clinkcService-ref="clinkcService"
+	/>
+	
+	<bean id="colinkchAction" class="com.ricardo.action.ColinkchAction" lazy-init="false"
+	p:colinkchService-ref="colinkchService"
+	p:chapterService-ref="chapterService"
+	p:teacherService-ref="teacherService"
+	p:courseService-ref="courseService"
+	/>
+	 
+	<bean id="courseAction" class="com.ricardo.action.CourseAction" lazy-init="false"
+	p:courseService-ref="courseService"
+	/>
+	
+	<bean id="logoutAction" class="com.ricardo.action.LogoutAction" lazy-init="false"
+	/>
+	
+	<bean id="slinkcAction" class="com.ricardo.action.SlinkcAction" lazy-init="false"
+	p:classService-ref="classService"
+	p:slinkcService-ref="slinkcService"
+	p:teacherService-ref="teacherService"
+	p:studentService-ref="studentService"
+	/>
+	
+	<bean id="tlinkcAction" class="com.ricardo.action.TlinkcAction" lazy-init="false"
+	p:tlinkcService-ref="tlinkcService"
+	p:teacherService-ref="teacherService"
+	p:classService-ref="classService"
+	/>
+	
+	</beans>

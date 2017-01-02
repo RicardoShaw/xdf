@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN" "http://struts.apache.org/dtds/struts-2.1.dtd">
+<struts>
+	<constant name="struts.devMode" value="true"/>
+	<package name="default" extends="struts-default">
+
+		
+				<!-- 定义全局Result映射 -->
+		<global-results>
+			<!-- 定义sql、root两个异常对应的视图页 -->
+			<result name="business">/WEB-INF/content/error.jsp</result>
+			<result name="root">/WEB-INF/content/error.jsp</result>
+			<result name="login">login.jsp</result>
+			<result name="manager">main.jsp</result>
+			<result name="message">/WEB-INF/content/message.jsp</result>
+			<result name="error">/WEB-INF/content/error.jsp</result>
+		</global-results>
+	
+
+		
+
+		
+
+	
+	
+		<action name="*_*" class="com.ricardo.action.{1}Action" method="{2}">
+			<result name="{2}_view">/WEB-INF/content/{1}/{2}.jsp</result>
+			<result name="Hmain">/WEB-INF/content/{1}/Hquery.jsp</result>
+			<result name="main">/WEB-INF/content/{1}/query.jsp</result>
+			<result name="manager">main.jsp</result>
+			<result name="login">login.jsp</result>
+			<result name="message">/WEB-INF/content/message.jsp</result>
+			<result name="error">/WEB-INF/content/error.jsp</result>
+		</action>
+	
+	
+
+		
+		
+
+		
+		</package>
+
+		
+		
+	
+	
+
+</struts>    
